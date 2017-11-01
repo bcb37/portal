@@ -3,19 +3,6 @@ defmodule Portal do
   Documentation for Portal.
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Portal.hello
-      :world
-
-  """
-  def hello do
-    :world
-  end
-
   defstruct [:left, :right]
 
     @doc """
@@ -36,15 +23,23 @@ defmodule Portal do
   Pushes data to the right in the given `portal`.
   """
   def push_right(portal) do
-    # See if we can pop data from left. If so, push the
-    # popped data to the right. Otherwise, do nothing.
-    case Portal.Door.pop(portal.left) do
-      :error   -> :ok
-      {:ok, h} -> Portal.Door.push(portal.right, h)
-    end
-
+    pushdir portal.left, portal.right
     # Let's return the portal itself
     portal
+  end
+
+  def push_left(portal) do
+    pushdir portal.right, portal.left
+    # Let's return the portal itself
+    portal
+  end
+
+  defp pushdir(from, to) do
+    case Portal.Door.pop(from) do
+      :error   -> :ok
+      {:ok, h} -> Portal.Door.push(to, h)
+    end
+
   end
 
     @doc """
@@ -53,7 +48,7 @@ defmodule Portal do
   def shoot(color) do
     Supervisor.start_child(Portal.Supervisor, [color])
   end
-  
+
 end
 
 defimpl Inspect, for: Portal do
